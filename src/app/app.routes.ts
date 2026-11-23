@@ -71,6 +71,20 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/moderacion/moderacion').then((m) => m.Moderacion),
   },
   {
+    path: 'admin/usuarios',
+    title: 'Usuarios · Mesa TCG',
+    canActivate: [rolGuard],
+    data: { roles: ['ADMIN'] },
+    loadComponent: () => import('./pages/admin-usuarios/admin-usuarios').then((m) => m.AdminUsuarios),
+  },
+  {
+    path: 'admin/categorias',
+    title: 'Categorías · Mesa TCG',
+    canActivate: [rolGuard],
+    data: { roles: ['ADMIN'] },
+    loadComponent: () => import('./pages/admin-categorias/admin-categorias').then((m) => m.AdminCategorias),
+  },
+  {
     path: 'sin-permiso',
     title: 'Sin permiso · Mesa TCG',
     loadComponent: () => import('./pages/sin-permiso/sin-permiso').then((m) => m.SinPermiso),
