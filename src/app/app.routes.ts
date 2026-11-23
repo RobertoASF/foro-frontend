@@ -32,9 +32,19 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/perfil/perfil').then((m) => m.Perfil),
   },
   {
+    path: 'buscar',
+    title: 'Buscar temas · Mesa TCG',
+    loadComponent: () => import('./pages/buscar/buscar').then((m) => m.Buscar),
+  },
+  {
     path: 'normas',
     title: 'Normas del foro · Mesa TCG',
     loadComponent: () => import('./pages/normas/normas').then((m) => m.Normas),
+  },
+  {
+    path: 'categorias/:id',
+    title: 'Categoría · Mesa TCG',
+    loadComponent: () => import('./pages/categoria/categoria').then((m) => m.CategoriaPagina),
   },
   {
     path: 'sin-permiso',

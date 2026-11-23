@@ -1,0 +1,71 @@
+@if (categoria(); as cat) {
+  <section class="cabecera-categoria text-white" [style.background]="'linear-gradient(135deg, ' + cat.color + ', var(--mesa-azul))'">
+    <div class="container py-4">
+      <nav aria-label="Ruta">
+        <ol class="breadcrumb mb-2">
+          <li class="breadcrumb-item"><a routerLink="/" class="text-white-50">Inicio</a></li>
+          <li class="breadcrumb-item active text-white" aria-current="page">{{ cat.nombre }}</li>
+        </ol>
+      </nav>
+      <div class="row align-items-center g-3">
+        <div class="col-12 col-md-8">
+          <h1 class="mb-1">{{ cat.nombre }}</h1>
+          <p class="mb-2 opacity-75">{{ cat.descripcion }}</p>
+          <small><i class="bi bi-collection me-1"></i>{{ temas().length }} {{ temas().length === 1 ? 'tema' : 'temas' }} ·
+            <i class="bi bi-chat-dots ms-2 me-1"></i>{{ totalComentarios() }}
+            {{ totalComentarios() === 1 ? 'comentario' : 'comentarios' }}</small>
+        </div>
+        <div class="col-12 col-md-4 text-md-end">
+          @if (usuario()) {
+            <a class="btn btn-dorado" routerLink="/temas/nuevo" [queryParams]="{ categoria: cat.id }">
+              <i class="bi bi-plus-lg me-1"></i>Publicar aquí</a>
+          } @else {
+            <a class="btn btn-outline-light" routerLink="/login">Inicia sesión para publicar</a>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container py-4">
+    <form class="tarjeta p-3 mb-4" [formGroup]="filtros" (ngSubmit)="$event.preventDefault()">
+      <div class="row g-2 align-items-end">
+        <div class="col-12 col-md-8">
+          <label for="texto" class="form-label small mb-1">Buscar en esta categoría</label>
+          <input id="texto" type="search" class="form-control" formControlName="texto" maxlength="60"
+                 placeholder="Ej: mazo, torneo, reglas"
+                 [class.is-invalid]="filtros.controls.texto.invalid">
+          <app-error-campo [control]="filtros.controls.texto" />
+        </div>
+        <div class="col-12 col-md-4">
+          <label for="orden" class="form-label small mb-1">Ordenar por</label>
+          <select id="orden" class="form-select" formControlName="orden">
+            <option value="recientes">Más recientes</option>
+            <option value="comentados">Más comentados</option>
+            <option value="alfabetico">Título (A-Z)</option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    <div class="row g-3">
+      @for (item of temas(); track item.tema.id) {
+        <div class="col-12 col-xl-6">
+          <app-tarjeta-tema [tema]="item.tema" [categoria]="item.categoria" [totalComentarios]="item.totalComentarios" />
+        </div>
+      } @empty {
+        <div class="col-12">
+          <div class="tarjeta p-4 text-center text-body-secondary">
+            <i class="bi bi-inbox display-6"></i>
+            <p class="mb-0 mt-2">No hay temas que coincidan. ¡Anímate a publicar el primero!</p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="container py-5 text-center">
+    <h1 class="h3">La categoría no existe</h1>
+    <a routerLink="/" class="btn btn-primary mt-2">Volver al inicio</a>
+  </div>
+}

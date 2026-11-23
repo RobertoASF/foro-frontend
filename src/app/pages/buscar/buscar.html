@@ -1,0 +1,52 @@
+<div class="container py-5">
+  <h1 class="titulo-seccion mb-4">Buscar temas</h1>
+
+  <div class="row g-4">
+    <aside class="col-12 col-lg-4">
+      <form class="tarjeta p-4" [formGroup]="form" (ngSubmit)="$event.preventDefault()">
+        <h2 class="h6 mb-3"><i class="bi bi-funnel me-2"></i>Filtros</h2>
+        <div class="mb-3">
+          <label for="texto" class="form-label">Texto</label>
+          <input id="texto" type="search" class="form-control" formControlName="texto" minlength="2" maxlength="60"
+                 placeholder="Título o contenido"
+                 [class.is-invalid]="form.controls.texto.invalid && form.controls.texto.dirty">
+          <app-error-campo [control]="form.controls.texto" />
+        </div>
+        <div class="mb-3">
+          <label for="categoria" class="form-label">Categoría</label>
+          <select id="categoria" class="form-select" formControlName="categoriaId">
+            <option [ngValue]="0">Todas</option>
+            @for (categoria of categorias; track categoria.id) {
+              <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+            }
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="autor" class="form-label">Autor</label>
+          <input id="autor" type="search" class="form-control" formControlName="autor" maxlength="30"
+                 placeholder="Nombre de usuario"
+                 [class.is-invalid]="form.controls.autor.invalid && form.controls.autor.dirty">
+          <app-error-campo [control]="form.controls.autor" [mensajes]="{ pattern: 'Solo letras sin tilde, números, punto y guiones' }" />
+        </div>
+        <button type="button" class="btn btn-outline-secondary w-100" (click)="limpiar()">
+          <i class="bi bi-x-circle me-1"></i>Limpiar filtros</button>
+      </form>
+    </aside>
+
+    <section class="col-12 col-lg-8">
+      <p class="text-body-secondary" aria-live="polite">
+        {{ resultados().length }} {{ resultados().length === 1 ? 'tema encontrado' : 'temas encontrados' }}
+      </p>
+      <div class="d-flex flex-column gap-3">
+        @for (item of resultados(); track item.tema.id) {
+          <app-tarjeta-tema [tema]="item.tema" [categoria]="item.categoria" [totalComentarios]="item.totalComentarios" />
+        } @empty {
+          <div class="tarjeta p-4 text-center text-body-secondary">
+            <i class="bi bi-search display-6"></i>
+            <p class="mb-0 mt-2">No encontramos temas con esos filtros.</p>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+</div>
