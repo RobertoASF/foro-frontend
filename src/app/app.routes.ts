@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { invitadoGuard, sesionGuard } from './guards/guards';
+import { invitadoGuard, rolGuard, sesionGuard } from './guards/guards';
 
 export const routes: Routes = [
   {
@@ -62,6 +62,13 @@ export const routes: Routes = [
     path: 'temas/:id',
     title: 'Tema · Mesa TCG',
     loadComponent: () => import('./pages/tema-detalle/tema-detalle').then((m) => m.TemaDetalle),
+  },
+  {
+    path: 'moderacion',
+    title: 'Moderación · Mesa TCG',
+    canActivate: [rolGuard],
+    data: { roles: ['MODERADOR', 'ADMIN'] },
+    loadComponent: () => import('./pages/moderacion/moderacion').then((m) => m.Moderacion),
   },
   {
     path: 'sin-permiso',
