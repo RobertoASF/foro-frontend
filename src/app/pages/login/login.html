@@ -1,0 +1,67 @@
+<div class="container py-5">
+  <div class="row g-4 justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+      <div class="tarjeta">
+        <div class="cabecera-formulario p-4 text-center">
+          <img src="logo.svg" alt="" width="56" height="56" class="bg-white rounded-3 p-1 mb-2">
+          <h1 class="h4 mb-0">Iniciar sesión</h1>
+          <p class="mb-0 small opacity-75">Entra para publicar, comentar y reportar</p>
+        </div>
+
+        <form class="p-4" [formGroup]="form" (ngSubmit)="ingresar()">
+          @if (error()) {
+            <div class="alert alert-danger py-2" role="alert"><i class="bi bi-exclamation-triangle me-2"></i>{{ error() }}</div>
+          }
+
+          <div class="mb-3">
+            <label for="identificador" class="form-label">Usuario o email</label>
+            <input id="identificador" type="text" class="form-control" formControlName="identificador"
+                   autocomplete="username" required minlength="3" maxlength="120"
+                   [class.is-invalid]="form.controls.identificador.invalid && form.controls.identificador.touched">
+            <app-error-campo [control]="form.controls.identificador" />
+          </div>
+
+          <div class="mb-2">
+            <label for="password" class="form-label">Clave</label>
+            <div class="input-group has-validation">
+              <input id="password" [type]="mostrarClave() ? 'text' : 'password'" class="form-control" formControlName="password"
+                     autocomplete="current-password" required maxlength="20"
+                     [class.is-invalid]="form.controls.password.invalid && form.controls.password.touched">
+              <button type="button" class="btn btn-outline-secondary" (click)="mostrarClave.set(!mostrarClave())"
+                      [attr.aria-label]="mostrarClave() ? 'Ocultar clave' : 'Mostrar clave'">
+                <i class="bi" [class.bi-eye]="!mostrarClave()" [class.bi-eye-slash]="mostrarClave()"></i>
+              </button>
+            </div>
+            <app-error-campo [control]="form.controls.password" />
+          </div>
+
+          <div class="text-end mb-3">
+            <a routerLink="/recuperar-clave" class="small">¿Olvidaste tu clave?</a>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 btn-lg">Entrar</button>
+
+          <p class="text-center small mt-3 mb-0">
+            ¿No tienes cuenta? <a routerLink="/registro">Crea una aquí</a>
+          </p>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-8 col-lg-4 col-xl-3">
+      <div class="tarjeta p-4">
+        <h2 class="h6"><i class="bi bi-person-badge me-2"></i>Cuentas de prueba</h2>
+        <p class="small text-body-secondary">Todas usan la clave <code>Foro2026*</code>. Haz clic para completar el formulario.</p>
+        <div class="d-grid gap-2">
+          @for (cuenta of cuentasPrueba; track cuenta.usuario) {
+            <button type="button" class="btn btn-outline-primary btn-sm d-flex justify-content-between"
+                    (click)="usarCuenta(cuenta.usuario)">
+              <span>{{ cuenta.usuario }}</span>
+              <span class="badge text-bg-light">{{ cuenta.rol }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
