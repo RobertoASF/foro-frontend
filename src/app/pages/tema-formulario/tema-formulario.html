@@ -1,0 +1,56 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-9 col-xl-8">
+      <h1 class="titulo-seccion mb-4">{{ editando() ? 'Editar tema' : 'Publicar un tema' }}</h1>
+
+      @if (sinPermiso()) {
+        <div class="alert alert-danger" role="alert">
+          Solo el autor puede editar este tema, o el tema ya no existe. <a routerLink="/">Volver al inicio</a>
+        </div>
+      }
+      @if (error()) {
+        <div class="alert alert-danger py-2" role="alert">{{ error() }}</div>
+      }
+
+      <form class="tarjeta p-4" [formGroup]="form" (ngSubmit)="guardar()">
+        <div class="row g-3">
+          <div class="col-12 col-md-8">
+            <label for="titulo" class="form-label">Título</label>
+            <input id="titulo" type="text" class="form-control" formControlName="titulo" required minlength="5" maxlength="150"
+                   placeholder="Ej: ¿Qué mazo recomiendan para empezar?"
+                   [class.is-invalid]="form.controls.titulo.invalid && form.controls.titulo.touched">
+            <app-error-campo [control]="form.controls.titulo" />
+          </div>
+          <div class="col-12 col-md-4">
+            <label for="categoria" class="form-label">Categoría</label>
+            <select id="categoria" class="form-select" formControlName="categoriaId" required
+                    [class.is-invalid]="form.controls.categoriaId.invalid && form.controls.categoriaId.touched">
+              <option [ngValue]="0" disabled>Elige una</option>
+              @for (categoria of categorias; track categoria.id) {
+                <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+              }
+            </select>
+            <app-error-campo [control]="form.controls.categoriaId" [mensajes]="{ min: 'Elige la categoría del tema' }" />
+          </div>
+          <div class="col-12">
+            <label for="contenido" class="form-label">Contenido</label>
+            <textarea id="contenido" class="form-control" rows="8" formControlName="contenido" required minlength="20"
+                      maxlength="2000" placeholder="Cuenta tu duda o tu experiencia con detalle"
+                      [class.is-invalid]="form.controls.contenido.invalid && form.controls.contenido.touched"></textarea>
+            <div class="d-flex justify-content-between">
+              <app-error-campo [control]="form.controls.contenido" />
+              <small class="texto-ayuda ms-auto">{{ form.controls.contenido.value.length }}/2000</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-end mt-4">
+          <a class="btn btn-outline-secondary" [routerLink]="editando() ? ['/temas', id()] : ['/']">Cancelar</a>
+          <button type="submit" class="btn btn-primary" [disabled]="sinPermiso()">
+            <i class="bi bi-check-lg me-1"></i>{{ editando() ? 'Guardar cambios' : 'Publicar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

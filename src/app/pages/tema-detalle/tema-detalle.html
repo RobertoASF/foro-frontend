@@ -1,0 +1,229 @@
+<div class="container py-4">
+  @if (aviso(); as a) {
+    <div class="alert alert-dismissible" [class.alert-success]="a.ok" [class.alert-danger]="!a.ok" role="status">
+      <i class="bi me-2" [class.bi-check-circle]="a.ok" [class.bi-exclamation-triangle]="!a.ok"></i>{{ a.mensaje }}
+      <button type="button" class="btn-close" aria-label="Cerrar" (click)="aviso.set(null)"></button>
+    </div>
+  }
+
+  @if (tema(); as t) {
+    <nav aria-label="Ruta">
+      <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a routerLink="/">Inicio</a></li>
+        @if (categoria(); as cat) {
+          <li class="breadcrumb-item"><a [routerLink]="['/categorias', cat.id]">{{ cat.nombre }}</a></li>
+        }
+        <li class="breadcrumb-item active text-truncate" aria-current="page">{{ t.titulo }}</li>
+      </ol>
+    </nav>
+
+    <div class="row g-4">
+      <div class="col-12 col-lg-8">
+        <article class="tarjeta p-4 mb-4">
+          <header class="d-flex align-items-center gap-3 mb-3">
+            <span class="avatar">{{ t.autorNombre.charAt(0) }}</span>
+            <div>
+              <strong>{{ t.autorNombre }}</strong>
+              <div class="small text-body-secondary">
+                {{ t.fechaCreacion | date: "d 'de' MMMM y, HH:mm" }}
+                @if (t.fechaActualizacion) {
+                  · <em>editado</em>
+                }
+              </div>
+            </div>
+            @if (categoria(); as cat) {
+              <span class="badge etiqueta-categoria ms-auto" [style.background]="cat.color">{{ cat.nombre }}</span>
+            }
+          </header>
+          <h1 class="h3">{{ t.titulo }}</h1>
+          <p class="contenido-texto mb-3">{{ t.contenido }}</p>
+
+          @if (usuario()) {
+            <div class="d-flex flex-wrap gap-2 border-top pt-3">
+              @if (esAutor(t.autorId)) {
+                <a class="btn btn-sm btn-outline-primary" [routerLink]="['/temas', t.id, 'editar']">
+                  <i class="bi bi-pencil me-1"></i>Editar</a>
+              }
+              @if (puedeEliminar(t.autorId)) {
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="abrir('eliminar', 'TEMA', t.id)">
+                  <i class="bi bi-trash me-1"></i>Eliminar</button>
+              }
+              @if (esModerador() && !esAutor(t.autorId)) {
+                <button type="button" class="btn btn-sm btn-warning" (click)="abrir('banear', 'TEMA', t.id)">
+                  <i class="bi bi-slash-circle me-1"></i>Banear</button>
+              }
+              @if (!esAutor(t.autorId)) {
+                <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" (click)="abrir('reportar', 'TEMA', t.id)">
+                  <i class="bi bi-flag me-1"></i>Reportar</button>
+              }
+            </div>
+            <ng-container [ngTemplateOutlet]="paneles" [ngTemplateOutletContext]="{ $implicit: 'TEMA', id: t.id }" />
+          }
+        </article>
+
+        <section aria-labelledby="titulo-comentarios">
+          <h2 id="titulo-comentarios" class="titulo-seccion h5 mb-3">Comentarios ({{ comentarios().length }})</h2>
+
+          @for (c of comentarios(); track c.id) {
+            <div class="tarjeta p-3 mb-3">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="avatar avatar-chico">{{ c.autorNombre.charAt(0) }}</span>
+                <strong class="small">{{ c.autorNombre }}</strong>
+                <small class="text-body-secondary">· {{ c.fechaCreacion | date: 'd MMM y, HH:mm' }}
+                  @if (c.fechaActualizacion) {
+                    · <em>editado</em>
+                  }
+                </small>
+              </div>
+
+              @if (panelAbierto('editar', 'COMENTARIO', c.id)) {
+                <form [formGroup]="formEdicion" (ngSubmit)="guardarEdicion(c.id)">
+                  <textarea class="form-control" rows="3" formControlName="contenido" required maxlength="1000"
+                            aria-label="Editar comentario"
+                            [class.is-invalid]="formEdicion.controls.contenido.invalid && formEdicion.controls.contenido.touched"></textarea>
+                  <app-error-campo [control]="formEdicion.controls.contenido" />
+                  <div class="d-flex gap-2 mt-2">
+                    <button type="submit" class="btn btn-sm btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cerrarPanel()">Cancelar</button>
+                  </div>
+                </form>
+              } @else {
+                <p class="contenido-texto mb-2">{{ c.contenido }}</p>
+              }
+
+              @if (usuario()) {
+                <div class="d-flex flex-wrap gap-2 small">
+                  @if (esAutor(c.autorId)) {
+                    <button type="button" class="btn btn-link btn-sm p-0" (click)="abrir('editar', 'COMENTARIO', c.id, c)">
+                      <i class="bi bi-pencil me-1"></i>Editar</button>
+                  }
+                  @if (puedeEliminar(c.autorId)) {
+                    <button type="button" class="btn btn-link btn-sm p-0 text-danger" (click)="abrir('eliminar', 'COMENTARIO', c.id)">
+                      <i class="bi bi-trash me-1"></i>Eliminar</button>
+                  }
+                  @if (esModerador() && !esAutor(c.autorId)) {
+                    <button type="button" class="btn btn-link btn-sm p-0 text-warning-emphasis" (click)="abrir('banear', 'COMENTARIO', c.id)">
+                      <i class="bi bi-slash-circle me-1"></i>Banear</button>
+                  }
+                  @if (!esAutor(c.autorId)) {
+                    <button type="button" class="btn btn-link btn-sm p-0 text-body-secondary ms-auto" (click)="abrir('reportar', 'COMENTARIO', c.id)">
+                      <i class="bi bi-flag me-1"></i>Reportar</button>
+                  }
+                </div>
+                <ng-container [ngTemplateOutlet]="paneles" [ngTemplateOutletContext]="{ $implicit: 'COMENTARIO', id: c.id }" />
+              }
+            </div>
+          } @empty {
+            <p class="text-body-secondary">Nadie ha comentado todavía. ¡Sé el primero!</p>
+          }
+
+          @if (usuario()) {
+            <form class="tarjeta p-3" [formGroup]="formComentario" (ngSubmit)="comentar()">
+              <label for="nuevoComentario" class="form-label fw-semibold">Escribe un comentario</label>
+              <textarea id="nuevoComentario" class="form-control" rows="3" formControlName="contenido" required
+                        minlength="2" maxlength="1000" placeholder="Comparte tu experiencia o responde la pregunta"
+                        [class.is-invalid]="formComentario.controls.contenido.invalid && formComentario.controls.contenido.touched"></textarea>
+              <app-error-campo [control]="formComentario.controls.contenido" />
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <small class="texto-ayuda">{{ formComentario.controls.contenido.value.length }}/1000</small>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-send me-1"></i>Comentar</button>
+              </div>
+            </form>
+          } @else {
+            <div class="tarjeta p-3 text-center">
+              <a routerLink="/login" [queryParams]="{ volver: '/temas/' + t.id }">Inicia sesión</a> para comentar.
+            </div>
+          }
+        </section>
+      </div>
+
+      <aside class="col-12 col-lg-4">
+        @if (categoria(); as cat) {
+          <div class="tarjeta overflow-hidden mb-4">
+            <img [src]="cat.imagen" [alt]="cat.nombre" class="w-100 imagen-lateral">
+            <div class="p-3">
+              <h2 class="h6 mb-1">{{ cat.nombre }}</h2>
+              <p class="small text-body-secondary mb-2">{{ cat.descripcion }}</p>
+              <a [routerLink]="['/categorias', cat.id]" class="small">Ver más temas <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div>
+        }
+        <div class="tarjeta p-3">
+          <h2 class="h6"><i class="bi bi-info-circle me-2"></i>Recuerda</h2>
+          <p class="small mb-0 text-body-secondary">
+            Sé respetuoso y comenta sobre el tema. Si algo rompe las <a routerLink="/normas">normas</a>, usa el botón Reportar.
+          </p>
+        </div>
+      </aside>
+    </div>
+  } @else {
+    <div class="tarjeta p-5 text-center">
+      <i class="bi bi-eye-slash display-5 text-body-secondary"></i>
+      <h1 class="h4 mt-3">Este tema no está disponible</h1>
+      <p class="text-body-secondary">No existe, fue eliminado o un moderador lo retiró por no cumplir las normas.</p>
+      <a routerLink="/" class="btn btn-primary">Volver al inicio</a>
+    </div>
+  }
+</div>
+
+<!-- Paneles para eliminar, reportar o banear. Se reutilizan para el tema y para cada comentario -->
+<ng-template #paneles let-tipo let-id="id">
+  @if (panelAbierto('eliminar', tipo, id)) {
+    <div class="panel-accion border-danger mt-3">
+      <p class="mb-2 small">¿Seguro que quieres eliminar este {{ tipo === 'TEMA' ? 'tema y todos sus comentarios' : 'comentario' }}?
+        No se puede deshacer.</p>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-sm btn-danger" (click)="eliminar(tipo, id)">Sí, eliminar</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cerrarPanel()">Cancelar</button>
+      </div>
+    </div>
+  }
+
+  @if (panelAbierto('reportar', tipo, id)) {
+    <form class="panel-accion mt-3" [formGroup]="formReporte" (ngSubmit)="reportar(tipo, id)">
+      <h3 class="h6"><i class="bi bi-flag me-1"></i>Reportar {{ tipo === 'TEMA' ? 'tema' : 'comentario' }}</h3>
+      <label class="form-label small" [for]="'normaReporte' + id">¿Qué norma no cumple?</label>
+      <select class="form-select form-select-sm" [id]="'normaReporte' + id" formControlName="normaId" required
+              [class.is-invalid]="formReporte.controls.normaId.invalid && formReporte.controls.normaId.touched">
+        <option [ngValue]="0" disabled>Elige una norma</option>
+        @for (norma of normas; track norma.id) {
+          <option [ngValue]="norma.id">{{ norma.titulo }}</option>
+        }
+      </select>
+      <app-error-campo [control]="formReporte.controls.normaId" [mensajes]="{ min: 'Elige la norma que no se cumple' }" />
+      <label class="form-label small mt-2" [for]="'detalleReporte' + id">Detalle (opcional)</label>
+      <textarea class="form-control form-control-sm" [id]="'detalleReporte' + id" rows="2" formControlName="detalle"
+                maxlength="500" [class.is-invalid]="formReporte.controls.detalle.invalid"></textarea>
+      <app-error-campo [control]="formReporte.controls.detalle" />
+      <div class="d-flex gap-2 mt-2">
+        <button type="submit" class="btn btn-sm btn-primary">Enviar reporte</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cerrarPanel()">Cancelar</button>
+      </div>
+    </form>
+  }
+
+  @if (panelAbierto('banear', tipo, id)) {
+    <form class="panel-accion border-warning mt-3" [formGroup]="formBaneo" (ngSubmit)="banear(tipo, id)">
+      <h3 class="h6"><i class="bi bi-slash-circle me-1"></i>Banear {{ tipo === 'TEMA' ? 'tema' : 'comentario' }}</h3>
+      <p class="small text-body-secondary mb-2">El contenido deja de verse en el foro. Solo un administrador puede levantar el baneo.</p>
+      <label class="form-label small" [for]="'normaBaneo' + id">Norma incumplida</label>
+      <select class="form-select form-select-sm" [id]="'normaBaneo' + id" formControlName="normaId" required
+              [class.is-invalid]="formBaneo.controls.normaId.invalid && formBaneo.controls.normaId.touched">
+        <option [ngValue]="0" disabled>Elige una norma</option>
+        @for (norma of normas; track norma.id) {
+          <option [ngValue]="norma.id">{{ norma.titulo }}</option>
+        }
+      </select>
+      <app-error-campo [control]="formBaneo.controls.normaId" [mensajes]="{ min: 'Elige la norma incumplida' }" />
+      <label class="form-label small mt-2" [for]="'motivoBaneo' + id">Motivo</label>
+      <textarea class="form-control form-control-sm" [id]="'motivoBaneo' + id" rows="2" formControlName="motivo"
+                required minlength="10" maxlength="500"
+                [class.is-invalid]="formBaneo.controls.motivo.invalid && formBaneo.controls.motivo.touched"></textarea>
+      <app-error-campo [control]="formBaneo.controls.motivo" />
+      <div class="d-flex gap-2 mt-2">
+        <button type="submit" class="btn btn-sm btn-warning">Banear</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cerrarPanel()">Cancelar</button>
+      </div>
+    </form>
+  }
+</ng-template>

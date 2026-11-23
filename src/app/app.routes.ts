@@ -47,6 +47,23 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/categoria/categoria').then((m) => m.CategoriaPagina),
   },
   {
+    path: 'temas/nuevo',
+    title: 'Publicar tema · Mesa TCG',
+    canActivate: [sesionGuard],
+    loadComponent: () => import('./pages/tema-formulario/tema-formulario').then((m) => m.TemaFormulario),
+  },
+  {
+    path: 'temas/:id/editar',
+    title: 'Editar tema · Mesa TCG',
+    canActivate: [sesionGuard],
+    loadComponent: () => import('./pages/tema-formulario/tema-formulario').then((m) => m.TemaFormulario),
+  },
+  {
+    path: 'temas/:id',
+    title: 'Tema · Mesa TCG',
+    loadComponent: () => import('./pages/tema-detalle/tema-detalle').then((m) => m.TemaDetalle),
+  },
+  {
     path: 'sin-permiso',
     title: 'Sin permiso · Mesa TCG',
     loadComponent: () => import('./pages/sin-permiso/sin-permiso').then((m) => m.SinPermiso),
