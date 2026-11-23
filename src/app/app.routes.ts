@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { invitadoGuard } from './guards/guards';
+import { invitadoGuard, sesionGuard } from './guards/guards';
 
 export const routes: Routes = [
   {
@@ -24,6 +24,12 @@ export const routes: Routes = [
     title: 'Recuperar clave · Mesa TCG',
     canActivate: [invitadoGuard],
     loadComponent: () => import('./pages/recuperar-clave/recuperar-clave').then((m) => m.RecuperarClave),
+  },
+  {
+    path: 'perfil',
+    title: 'Mi perfil · Mesa TCG',
+    canActivate: [sesionGuard],
+    loadComponent: () => import('./pages/perfil/perfil').then((m) => m.Perfil),
   },
   {
     path: 'normas',

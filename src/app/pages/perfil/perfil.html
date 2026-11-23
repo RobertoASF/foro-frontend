@@ -1,0 +1,152 @@
+<div class="container py-5">
+  @if (bienvenida()) {
+    <div class="alert alert-success" role="status">
+      <i class="bi bi-stars me-2"></i>¡Bienvenido a Mesa TCG! Tu cuenta quedó creada. Completa tu perfil si quieres.
+    </div>
+  }
+
+  @if (usuario(); as actual) {
+    <div class="row g-4">
+      <aside class="col-12 col-lg-4">
+        <div class="tarjeta p-4 text-center">
+          <span class="avatar avatar-lg mx-auto">{{ actual.nombreUsuario.charAt(0) }}</span>
+          <h1 class="h4 mt-3 mb-1">{{ actual.nombreUsuario }}</h1>
+          <span class="badge text-bg-primary">{{ actual.rol }}</span>
+          <ul class="list-unstyled text-start small mt-4 mb-0">
+            <li class="mb-2"><i class="bi bi-envelope me-2"></i>{{ actual.email }}</li>
+            <li class="mb-2"><i class="bi bi-calendar3 me-2"></i>Miembro desde {{ actual.fechaCreacion | date: 'MMMM y' }}</li>
+            <li class="mb-2"><i class="bi bi-suit-spade me-2"></i>{{ juegoFavorito()?.nombre ?? 'Sin juego favorito' }}</li>
+            @if (actual.biografia) {
+              <li class="fst-italic text-body-secondary">"{{ actual.biografia }}"</li>
+            }
+          </ul>
+        </div>
+
+        <div class="tarjeta p-4 mt-4">
+          <h2 class="h6 mb-3"><i class="bi bi-collection me-2"></i>Mis temas ({{ misTemas().length }})</h2>
+          <ul class="list-unstyled small mb-0">
+            @for (item of misTemas(); track item.tema.id) {
+              <li class="mb-2 text-truncate">
+                <a [routerLink]="['/temas', item.tema.id]">{{ item.tema.titulo }}</a>
+                <span class="text-body-secondary"> · {{ item.totalComentarios }} <i class="bi bi-chat-dots"></i></span>
+              </li>
+            } @empty {
+              <li class="text-body-secondary">Todavía no publicas temas. <a routerLink="/temas/nuevo">Publica el primero</a>.</li>
+            }
+          </ul>
+        </div>
+      </aside>
+
+      <div class="col-12 col-lg-8">
+        <form class="tarjeta p-4 mb-4" [formGroup]="formDatos" (ngSubmit)="guardarDatos()">
+          <h2 class="h5 mb-3"><i class="bi bi-person-gear me-2"></i>Modificar perfil</h2>
+          @if (mensajeDatos()) {
+            <div class="alert alert-success py-2" role="status">{{ mensajeDatos() }}</div>
+          }
+          @if (errorDatos()) {
+            <div class="alert alert-danger py-2" role="alert">{{ errorDatos() }}</div>
+          }
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label for="nombre" class="form-label">Nombre de usuario</label>
+              <input id="nombre" type="text" class="form-control" [value]="actual.nombreUsuario" disabled>
+              <div class="texto-ayuda">No se puede cambiar porque aparece en tus publicaciones.</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <label for="email" class="form-label">Email</label>
+              <input id="email" type="email" class="form-control" formControlName="email" required maxlength="120"
+                     [class.is-invalid]="formDatos.controls.email.invalid && formDatos.controls.email.touched">
+              <app-error-campo [control]="formDatos.controls.email" [mensajes]="{ enUso: 'Ese email ya lo usa otra cuenta' }" />
+            </div>
+            <div class="col-12">
+              <label for="juego" class="form-label">Juego favorito</label>
+              <select id="juego" class="form-select" formControlName="juegoFavoritoId"
+                      [class.is-invalid]="formDatos.controls.juegoFavoritoId.invalid && formDatos.controls.juegoFavoritoId.touched">
+                <option [ngValue]="0" disabled>Elige un juego</option>
+                @for (categoria of categorias; track categoria.id) {
+                  <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+                }
+              </select>
+              <app-error-campo [control]="formDatos.controls.juegoFavoritoId" [mensajes]="{ min: 'Elige un juego de la lista' }" />
+            </div>
+            <div class="col-12">
+              <label for="biografia" class="form-label">Sobre ti</label>
+              <textarea id="biografia" class="form-control" rows="3" formControlName="biografia" maxlength="200"
+                        placeholder="Cuéntale a la comunidad qué juegas y desde cuándo"
+                        [class.is-invalid]="formDatos.controls.biografia.invalid && formDatos.controls.biografia.touched"></textarea>
+              <div class="texto-ayuda text-end">{{ largoBiografia() }}/200</div>
+              <app-error-campo [control]="formDatos.controls.biografia" />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary mt-3">Guardar cambios</button>
+        </form>
+
+        <form class="tarjeta p-4 mb-4" [formGroup]="formClave" (ngSubmit)="cambiarClave()">
+          <h2 class="h5 mb-3"><i class="bi bi-shield-lock me-2"></i>Cambiar clave</h2>
+          @if (mensajeClave()) {
+            <div class="alert alert-success py-2" role="status">{{ mensajeClave() }}</div>
+          }
+          @if (errorClave()) {
+            <div class="alert alert-danger py-2" role="alert">{{ errorClave() }}</div>
+          }
+          <div class="row g-3">
+            <div class="col-12">
+              <label for="actual" class="form-label">Clave actual</label>
+              <input id="actual" type="password" class="form-control" formControlName="actual" autocomplete="current-password"
+                     required [class.is-invalid]="formClave.controls.actual.invalid && formClave.controls.actual.touched">
+              <app-error-campo [control]="formClave.controls.actual" />
+            </div>
+            <div class="col-12 col-md-6">
+              <label for="nueva" class="form-label">Clave nueva</label>
+              <input id="nueva" type="password" class="form-control" formControlName="password" autocomplete="new-password"
+                     required minlength="8" maxlength="20"
+                     [class.is-invalid]="formClave.controls.password.invalid && formClave.controls.password.touched">
+              <app-error-campo [control]="formClave.controls.password" />
+            </div>
+            <div class="col-12 col-md-6">
+              <label for="confirmar" class="form-label">Repite la clave nueva</label>
+              <input id="confirmar" type="password" class="form-control" formControlName="confirmar" autocomplete="new-password"
+                     required
+                     [class.is-invalid]="(formClave.controls.confirmar.invalid || formClave.hasError('noCoinciden')) && formClave.controls.confirmar.touched">
+              <app-error-campo [control]="formClave.controls.confirmar" />
+              @if (formClave.hasError('noCoinciden') && formClave.controls.confirmar.touched) {
+                <div class="invalid-feedback d-block">Las claves no coinciden</div>
+              }
+            </div>
+          </div>
+          <p class="texto-ayuda mt-2 mb-0">8 a 20 caracteres, con mayúscula, minúscula, número y carácter especial, sin espacios.</p>
+          <button type="submit" class="btn btn-outline-primary mt-3">Actualizar clave</button>
+        </form>
+
+        <div class="tarjeta p-4">
+          <h2 class="h5 mb-3"><i class="bi bi-flag me-2"></i>Mis reportes</h2>
+          @if (misReportes().length === 0) {
+            <p class="text-body-secondary small mb-0">No has reportado contenido.</p>
+          } @else {
+            <div class="table-responsive">
+              <table class="table table-sm align-middle mb-0">
+                <thead>
+                  <tr><th>Fecha</th><th>Contenido</th><th>Detalle</th><th>Estado</th></tr>
+                </thead>
+                <tbody>
+                  @for (reporte of misReportes(); track reporte.id) {
+                    <tr>
+                      <td class="text-nowrap">{{ reporte.fechaCreacion | date: 'd MMM y' }}</td>
+                      <td class="text-nowrap">{{ reporte.tipoContenido === 'TEMA' ? 'Tema' : 'Comentario' }} #{{ reporte.contenidoId }}</td>
+                      <td>{{ reporte.detalle || '—' }}</td>
+                      <td>
+                        <span class="badge" [class.text-bg-warning]="reporte.estado === 'PENDIENTE'"
+                              [class.text-bg-success]="reporte.estado === 'ACEPTADO'"
+                              [class.text-bg-secondary]="reporte.estado === 'DESCARTADO'">{{ reporte.estado }}</span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>
