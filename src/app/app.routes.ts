@@ -2,6 +2,11 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
+    path: '',
+    title: 'Inicio · Mesa TCG',
+    loadComponent: () => import('./pages/inicio/inicio').then((m) => m.Inicio),
+  },
+  {
     path: 'normas',
     title: 'Normas del foro · Mesa TCG',
     loadComponent: () => import('./pages/normas/normas').then((m) => m.Normas),

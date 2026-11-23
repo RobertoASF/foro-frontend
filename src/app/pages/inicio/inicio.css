@@ -1,0 +1,34 @@
+.portada {
+  background: linear-gradient(135deg, var(--mesa-azul) 0%, var(--mesa-azul-claro) 55%, var(--mesa-morado) 100%);
+}
+
+.imagen-portada {
+  max-height: 300px;
+}
+
+.cifra {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--mesa-dorado);
+  line-height: 1.1;
+}
+
+.imagen-categoria {
+  height: 140px;
+  object-fit: cover;
+}
+
+.nombre-categoria {
+  color: var(--mesa-azul);
+}
+
+@media (max-width: 575.98px) {
+  .cifra {
+    font-size: 1.5rem;
+  }
+
+  .imagen-portada {
+    max-height: 200px;
+  }
+}
