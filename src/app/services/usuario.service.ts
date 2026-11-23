@@ -8,6 +8,8 @@ export interface DatosRegistro {
   email: string;
   password: string;
   juegoFavoritoId: number | null;
+  /** Solo un administrador elige el rol; en el registro público siempre es USUARIO. */
+  rol?: Rol;
 }
 
 export interface DatosPerfil {
@@ -68,7 +70,7 @@ export class UsuarioService {
       nombreUsuario: datos.nombreUsuario.trim(),
       email: datos.email.trim().toLowerCase(),
       password: datos.password,
-      rol: 'USUARIO',
+      rol: datos.rol ?? 'USUARIO',
       activo: true,
       juegoFavoritoId: datos.juegoFavoritoId,
       biografia: '',
