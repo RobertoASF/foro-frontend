@@ -1,0 +1,105 @@
+<section class="portada text-white">
+  <div class="container py-5">
+    <div class="row align-items-center g-4">
+      <div class="col-12 col-lg-7 text-center text-lg-start">
+        <span class="badge text-bg-warning mb-3">Foro de juegos de cartas coleccionables</span>
+        <h1 class="display-5 mb-3">Tu mesa para hablar de mazos, torneos y cartas</h1>
+        <p class="lead mb-4">
+          Comparte tus dudas, encuentra jugadores y entérate de lo nuevo en cinco juegos: Magic, Mitos y Leyendas,
+          Pokemon, One Piece y Yu-Gi-Oh!
+        </p>
+        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center justify-content-lg-start">
+          @if (usuario()) {
+            <a class="btn btn-dorado btn-lg" routerLink="/temas/nuevo"><i class="bi bi-plus-lg me-2"></i>Publicar un tema</a>
+          } @else {
+            <a class="btn btn-dorado btn-lg" routerLink="/registro"><i class="bi bi-person-plus me-2"></i>Crear cuenta gratis</a>
+          }
+          <a class="btn btn-outline-light btn-lg" routerLink="/buscar"><i class="bi bi-search me-2"></i>Buscar temas</a>
+        </div>
+      </div>
+      <div class="col-12 col-lg-5 text-center">
+        <img src="img/portada.svg" alt="Cartas sobre una mesa de juego" class="img-fluid imagen-portada">
+      </div>
+    </div>
+
+    <div class="row g-3 mt-2 text-center">
+      <div class="col-4">
+        <div class="cifra">{{ totalTemas() }}</div>
+        <small>temas</small>
+      </div>
+      <div class="col-4">
+        <div class="cifra">{{ totalComentarios() }}</div>
+        <small>comentarios</small>
+      </div>
+      <div class="col-4">
+        <div class="cifra">{{ miembros() }}</div>
+        <small>miembros</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container py-5">
+  <h2 class="titulo-seccion h3 mb-4" id="categorias">Categorías</h2>
+  <div class="row g-4">
+    @for (item of resumen(); track item.categoria.id) {
+      <div class="col-12 col-sm-6 col-lg-4">
+        <article class="tarjeta tarjeta-interactiva h-100 overflow-hidden position-relative">
+          <img [src]="item.categoria.imagen" [alt]="item.categoria.nombre" class="w-100 imagen-categoria">
+          <div class="p-3">
+            <h3 class="h5 mb-1">
+              <a class="stretched-link text-decoration-none nombre-categoria" [routerLink]="['/categorias', item.categoria.id]">
+                {{ item.categoria.nombre }}
+              </a>
+            </h3>
+            <p class="small text-body-secondary mb-3">{{ item.categoria.descripcion }}</p>
+            <div class="d-flex justify-content-between small">
+              <span><i class="bi bi-collection me-1"></i>{{ item.totalTemas }} {{ item.totalTemas === 1 ? 'tema' : 'temas' }}</span>
+              <span><i class="bi bi-chat-dots me-1"></i>{{ item.totalComentarios }}
+                {{ item.totalComentarios === 1 ? 'comentario' : 'comentarios' }}</span>
+            </div>
+            @if (item.ultimoTema; as ultimo) {
+              <p class="small mb-0 mt-2 text-truncate text-body-secondary">
+                Último: {{ ultimo.titulo }} · {{ ultimo.fechaCreacion | date: 'd MMM' }}
+              </p>
+            }
+          </div>
+        </article>
+      </div>
+    }
+  </div>
+
+  <div class="row g-4 mt-4">
+    <div class="col-12 col-lg-8">
+      <h2 class="titulo-seccion h3 mb-4">Temas recientes</h2>
+      <div class="d-flex flex-column gap-3">
+        @for (item of recientes(); track item.tema.id) {
+          <app-tarjeta-tema [tema]="item.tema" [categoria]="item.categoria" [totalComentarios]="item.totalComentarios" />
+        } @empty {
+          <p class="text-body-secondary">Todavía no hay temas publicados.</p>
+        }
+      </div>
+    </div>
+
+    <aside class="col-12 col-lg-4">
+      <div class="tarjeta p-4 mb-4">
+        <h2 class="h5"><i class="bi bi-lightbulb text-warning me-2"></i>Cómo participar</h2>
+        <ol class="small mb-0 ps-3">
+          <li>Crea tu cuenta con un nombre de usuario y una clave segura.</li>
+          <li>Elige la categoría de tu juego y publica tu tema.</li>
+          <li>Comenta y ayuda a otros jugadores.</li>
+          <li>Si ves algo que rompe las normas, repórtalo.</li>
+        </ol>
+      </div>
+      <div class="tarjeta p-4">
+        <h2 class="h5"><i class="bi bi-journal-check text-success me-2"></i>Normas del foro</h2>
+        <ul class="list-unstyled small mb-3">
+          @for (norma of normas; track norma.id) {
+            <li class="mb-2"><strong>{{ norma.titulo }}.</strong> {{ norma.descripcion }}</li>
+          }
+        </ul>
+        <a routerLink="/normas" class="small">Ver todas las normas <i class="bi bi-arrow-right"></i></a>
+      </div>
+    </aside>
+  </div>
+</div>

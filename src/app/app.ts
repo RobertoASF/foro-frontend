@@ -1,12 +1,24 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Navbar } from './shared/navbar/navbar';
+import { Pie } from './shared/pie/pie';
 
 @Component({
-  imports: [RouterOutlet],
   selector: 'app-root',
-  styleUrl: './app.css',
-  templateUrl: './app.html',
+  imports: [RouterOutlet, Navbar, Pie],
+  template: `
+    <app-navbar />
+    <main class="flex-grow-1">
+      <router-outlet />
+    </main>
+    <app-pie />
+  `,
+  styles: `
+    :host {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+  `,
 })
-export class App {
-  protected readonly title = signal('foro-frontend');
-}
+export class App {}

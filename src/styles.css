@@ -1,1 +1,186 @@
-/* You can add global styles to this file, and also import other style files */
+/* Tema visual de Mesa TCG. Se apoya en las variables de Bootstrap 5.3 */
+:root {
+  --mesa-azul: #1d2147;
+  --mesa-azul-claro: #2b2f63;
+  --mesa-morado: #5b3cc4;
+  --mesa-morado-oscuro: #47309c;
+  --mesa-dorado: #f2b632;
+  --mesa-fondo: #f4f5fb;
+  --mesa-texto: #23263a;
+  --mesa-borde: #e3e5f0;
+  --mesa-sombra: 0 6px 18px rgba(29, 33, 71, 0.08);
+
+  --bs-primary: var(--mesa-morado);
+  --bs-primary-rgb: 91, 60, 196;
+  --bs-link-color: var(--mesa-morado);
+  --bs-link-color-rgb: 91, 60, 196;
+  --bs-link-hover-color: var(--mesa-morado-oscuro);
+  --bs-body-bg: var(--mesa-fondo);
+  --bs-body-color: var(--mesa-texto);
+  --bs-body-font-family: 'Nunito Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --bs-border-radius: 0.6rem;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+.navbar-brand,
+.titulo-seccion {
+  font-family: 'Poppins', var(--bs-body-font-family);
+  font-weight: 600;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--mesa-morado);
+  --bs-btn-border-color: var(--mesa-morado);
+  --bs-btn-hover-bg: var(--mesa-morado-oscuro);
+  --bs-btn-hover-border-color: var(--mesa-morado-oscuro);
+  --bs-btn-active-bg: var(--mesa-morado-oscuro);
+  --bs-btn-disabled-bg: var(--mesa-morado);
+  --bs-btn-disabled-border-color: var(--mesa-morado);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--mesa-morado);
+  --bs-btn-border-color: var(--mesa-morado);
+  --bs-btn-hover-bg: var(--mesa-morado);
+  --bs-btn-hover-border-color: var(--mesa-morado);
+  --bs-btn-active-bg: var(--mesa-morado-oscuro);
+}
+
+.btn-dorado {
+  --bs-btn-bg: var(--mesa-dorado);
+  --bs-btn-border-color: var(--mesa-dorado);
+  --bs-btn-color: var(--mesa-azul);
+  --bs-btn-hover-bg: #e0a21d;
+  --bs-btn-hover-border-color: #e0a21d;
+  --bs-btn-hover-color: var(--mesa-azul);
+  font-weight: 700;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+  border-color: var(--mesa-morado);
+  box-shadow: 0 0 0 0.2rem rgba(91, 60, 196, 0.2);
+}
+
+.form-check-input:checked {
+  background-color: var(--mesa-morado);
+  border-color: var(--mesa-morado);
+}
+
+/* Tarjetas del sitio */
+.tarjeta {
+  background: #ffffff;
+  border: 1px solid var(--mesa-borde);
+  border-radius: 1rem;
+  box-shadow: var(--mesa-sombra);
+}
+
+.tarjeta-interactiva {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tarjeta-interactiva:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(29, 33, 71, 0.14);
+}
+
+.titulo-seccion {
+  color: var(--mesa-azul);
+  border-left: 5px solid var(--mesa-dorado);
+  padding-left: 0.75rem;
+}
+
+/* Avatar con la inicial del usuario */
+.avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--mesa-morado);
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.avatar-lg {
+  width: 4.5rem;
+  height: 4.5rem;
+  font-size: 1.8rem;
+}
+
+.etiqueta-categoria {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Formularios centrados para login, registro y recuperar clave */
+.panel-formulario {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.cabecera-formulario {
+  background: linear-gradient(135deg, var(--mesa-azul), var(--mesa-morado));
+  color: #ffffff;
+  border-radius: 1rem 1rem 0 0;
+}
+
+.texto-ayuda {
+  font-size: 0.85rem;
+  color: #6c7088;
+}
+
+.contenido-texto {
+  white-space: pre-line;
+}
+
+/* Indicador de pasos en recuperar clave */
+.pasos li {
+  flex: 1;
+  text-align: center;
+  padding-bottom: 0.4rem;
+  border-bottom: 3px solid var(--mesa-borde);
+  color: #8a8ea8;
+}
+
+.pasos li.activo {
+  border-color: var(--mesa-morado);
+  color: var(--mesa-morado);
+  font-weight: 700;
+}
+
+.texto-corto {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.avatar-tabla {
+  width: 2rem;
+  height: 2rem;
+  font-size: 0.9rem;
+}
+
+.franja {
+  height: 8px;
+}

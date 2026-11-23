@@ -1,10 +1,17 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { registerLocaleData } from '@angular/common';
+import localeEsCl from '@angular/common/locales/es-CL';
+import { ApplicationConfig, LOCALE_ID, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { routes } from './app.routes';
+
+registerLocaleData(localeEsCl);
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes)
-  ]
+    // Fechas y números en formato chileno
+    { provide: LOCALE_ID, useValue: 'es-CL' },
+    // withComponentInputBinding entrega el :id de la ruta como input del componente
+    provideRouter(routes, withComponentInputBinding(), withInMemoryScrolling({ scrollPositionRestoration: 'top' })),
+  ],
 };

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { combineLatest, map } from 'rxjs';
+import { combineLatest, map, scan } from 'rxjs';
 import { CATEGORIAS, COMENTARIOS, TEMAS } from '../data/datos-iniciales';
 import { Categoria, Comentario, Resultado, Tema, TipoContenido, Usuario } from '../models/modelos';
 import { ColeccionObservable } from './coleccion-observable';
@@ -20,6 +20,13 @@ export interface FiltroTemas {
   texto?: string;
   categoriaId?: number | null;
   autor?: string;
+  autorId?: number;
+}
+
+export interface TemaConDetalle {
+  tema: Tema;
+  categoria: Categoria | undefined;
+  totalComentarios: number;
 }
 
 export interface ResumenCategoria {
@@ -41,10 +48,15 @@ export class ForoService {
   readonly temas$ = this.temas.cambios$;
   readonly comentarios$ = this.comentarios.cambios$;
 
-  /** Se vuelve a calcular cada vez que cambia un tema, comentario o categoría. */
-  readonly resumen$ = combineLatest([this.categorias$, this.temas$, this.comentarios$]).pipe(
-    map(() => this.resumenCategorias()),
+  /**
+   * Avisa cuando cambia cualquier dato del foro: categorías, temas o comentarios.
+   * Emite un número de versión distinto cada vez, así los signals que lo leen se recalculan.
+   */
+  readonly cambios$ = combineLatest([this.categorias$, this.temas$, this.comentarios$]).pipe(
+    scan((version) => version + 1, 0),
   );
+
+  readonly resumen$ = this.cambios$.pipe(map(() => this.resumenCategorias()));
 
   // ---------- Consultas del foro: solo muestran contenido visible ----------
 
@@ -62,6 +74,7 @@ export class ForoService {
     return this.temas.todos
       .filter((tema) => !tema.baneado)
       .filter((tema) => !filtro.categoriaId || tema.categoriaId === filtro.categoriaId)
+      .filter((tema) => !filtro.autorId || tema.autorId === filtro.autorId)
       .filter((tema) => !autor || tema.autorNombre.toLowerCase().includes(autor))
       .filter(
         (tema) => !texto || tema.titulo.toLowerCase().includes(texto) || tema.contenido.toLowerCase().includes(texto),
@@ -71,6 +84,14 @@ export class ForoService {
 
   temasRecientes(cantidad: number): Tema[] {
     return this.buscarTemas().slice(0, cantidad);
+  }
+
+  conDetalle(temas: Tema[]): TemaConDetalle[] {
+    return temas.map((tema) => ({
+      tema,
+      categoria: this.categoria(tema.categoriaId),
+      totalComentarios: this.totalComentarios(tema.id),
+    }));
   }
 
   temaVisible(id: number): Tema | undefined {
