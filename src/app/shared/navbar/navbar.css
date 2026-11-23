@@ -1,0 +1,35 @@
+.barra {
+  background: var(--mesa-azul);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.logo {
+  background: #ffffff;
+  border-radius: 0.6rem;
+  padding: 2px;
+}
+
+.texto-dorado {
+  color: var(--mesa-dorado);
+}
+
+.nav-link.active {
+  color: var(--mesa-dorado) !important;
+}
+
+.avatar-sm {
+  width: 1.9rem;
+  height: 1.9rem;
+  font-size: 0.9rem;
+  background: var(--mesa-dorado);
+  color: var(--mesa-azul);
+}
+
+/* En celular el menú abierto ocupa todo el ancho y los botones se apilan */
+@media (max-width: 1199.98px) {
+  .navbar-collapse {
+    padding: 0.75rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 0.5rem;
+  }
+}

@@ -1,0 +1,77 @@
+<nav class="navbar navbar-expand-xl navbar-dark barra sticky-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/" (click)="cerrarMenu()">
+      <img src="logo.svg" alt="" width="40" height="40" class="logo">
+      <span>Mesa <span class="texto-dorado">TCG</span></span>
+    </a>
+
+    <button class="navbar-toggler" type="button" aria-controls="menuPrincipal" [attr.aria-expanded]="menuAbierto()"
+            aria-label="Abrir menú" (click)="alternarMenu()">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="menuPrincipal" [class.show]="menuAbierto()">
+      <ul class="navbar-nav me-auto mb-2 mb-xl-0">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+             (click)="cerrarMenu()"><i class="bi bi-house-door me-1"></i>Inicio</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/buscar" routerLinkActive="active" (click)="cerrarMenu()">
+            <i class="bi bi-search me-1"></i>Buscar</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/normas" routerLinkActive="active" (click)="cerrarMenu()">
+            <i class="bi bi-journal-check me-1"></i>Normas</a>
+        </li>
+        @if (esModerador()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/moderacion" routerLinkActive="active" (click)="cerrarMenu()">
+              <i class="bi bi-shield-check me-1"></i>Moderación
+              @if (pendientes() > 0) {
+                <span class="badge rounded-pill text-bg-warning ms-1" title="Reportes pendientes">{{ pendientes() }}</span>
+              }
+            </a>
+          </li>
+        }
+        @if (esAdmin()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/usuarios" routerLinkActive="active" (click)="cerrarMenu()">
+              <i class="bi bi-people me-1"></i>Usuarios</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/categorias" routerLinkActive="active" (click)="cerrarMenu()">
+              <i class="bi bi-grid me-1"></i>Categorías</a>
+          </li>
+        }
+      </ul>
+
+      @if (usuario(); as actual) {
+        <div class="d-flex flex-column flex-xl-row align-items-xl-center gap-2">
+          <a class="btn btn-dorado btn-sm" routerLink="/temas/nuevo" (click)="cerrarMenu()">
+            <i class="bi bi-plus-lg me-1"></i>Publicar tema</a>
+          <div class="dropdown">
+            <button class="btn btn-link nav-link dropdown-toggle d-flex align-items-center gap-2 text-white" type="button"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="avatar avatar-sm">{{ actual.nombreUsuario.charAt(0) }}</span>
+              <span>{{ actual.nombreUsuario }}</span>
+              <span class="badge text-bg-light">{{ actual.rol }}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" routerLink="/perfil" (click)="cerrarMenu()">
+                <i class="bi bi-person-gear me-2"></i>Mi perfil</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><button class="dropdown-item text-danger" type="button" (click)="cerrarSesion()">
+                <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</button></li>
+            </ul>
+          </div>
+        </div>
+      } @else {
+        <div class="d-flex flex-column flex-xl-row gap-2">
+          <a class="btn btn-outline-light btn-sm" routerLink="/login" (click)="cerrarMenu()">Iniciar sesión</a>
+          <a class="btn btn-dorado btn-sm" routerLink="/registro" (click)="cerrarMenu()">Crear cuenta</a>
+        </div>
+      }
+    </div>
+  </div>
+</nav>

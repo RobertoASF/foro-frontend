@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Mesa TCG">
+  <rect x="14" y="10" width="26" height="38" rx="4" fill="#3a2a8c" transform="rotate(-16 27 29)"/>
+  <rect x="20" y="10" width="26" height="38" rx="4" fill="#5b3cc4" transform="rotate(-2 33 29)"/>
+  <rect x="26" y="12" width="26" height="38" rx="4" fill="#f2b632" transform="rotate(12 39 31)"/>
+  <path d="M39 22l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.1 5.9-.8z" fill="#1d2147" transform="rotate(12 39 31)"/>
+  <rect x="8" y="52" width="48" height="5" rx="2.5" fill="#1d2147"/>
+</svg>
