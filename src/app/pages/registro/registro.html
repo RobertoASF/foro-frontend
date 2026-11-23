@@ -1,0 +1,105 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8 col-xl-7">
+      <div class="tarjeta">
+        <div class="cabecera-formulario p-4 text-center">
+          <i class="bi bi-person-plus display-6"></i>
+          <h1 class="h4 mb-0">Crear cuenta</h1>
+          <p class="mb-0 small opacity-75">Únete a la comunidad de jugadores de cartas</p>
+        </div>
+
+        <form class="p-4" [formGroup]="form" (ngSubmit)="registrar()">
+          @if (error()) {
+            <div class="alert alert-danger py-2" role="alert">{{ error() }}</div>
+          }
+
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label for="nombreUsuario" class="form-label">Nombre de usuario</label>
+              <input id="nombreUsuario" type="text" class="form-control" formControlName="nombreUsuario"
+                     autocomplete="username" required minlength="3" maxlength="30" pattern="[a-zA-Z0-9._\-]+"
+                     [class.is-invalid]="form.controls.nombreUsuario.invalid && form.controls.nombreUsuario.touched"
+                     [class.is-valid]="form.controls.nombreUsuario.valid && form.controls.nombreUsuario.touched">
+              <div class="texto-ayuda">De 3 a 30 caracteres: letras, números, punto y guiones.</div>
+              <app-error-campo [control]="form.controls.nombreUsuario"
+                               [mensajes]="{ pattern: 'Solo letras sin tilde, números, punto y guiones' }" />
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label for="email" class="form-label">Email</label>
+              <input id="email" type="email" class="form-control" formControlName="email" autocomplete="email"
+                     required maxlength="120"
+                     [class.is-invalid]="form.controls.email.invalid && form.controls.email.touched"
+                     [class.is-valid]="form.controls.email.valid && form.controls.email.touched">
+              <app-error-campo [control]="form.controls.email"
+                               [mensajes]="{ enUso: 'Ya existe una cuenta con ese email' }" />
+            </div>
+
+            <div class="col-12">
+              <label for="juegoFavorito" class="form-label">Tu juego favorito</label>
+              <select id="juegoFavorito" class="form-select" formControlName="juegoFavoritoId" required
+                      [class.is-invalid]="form.controls.juegoFavoritoId.invalid && form.controls.juegoFavoritoId.touched">
+                <option [ngValue]="0" disabled>Elige un juego</option>
+                @for (categoria of categorias; track categoria.id) {
+                  <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+                }
+              </select>
+              <app-error-campo [control]="form.controls.juegoFavoritoId" [mensajes]="{ min: 'Elige un juego de la lista' }" />
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label for="password" class="form-label">Clave</label>
+              <div class="input-group has-validation">
+                <input id="password" [type]="mostrarClave() ? 'text' : 'password'" class="form-control"
+                       formControlName="password" autocomplete="new-password" required minlength="8" maxlength="20"
+                       [class.is-invalid]="form.controls.password.invalid && form.controls.password.touched"
+                       [class.is-valid]="form.controls.password.valid && form.controls.password.touched">
+                <button type="button" class="btn btn-outline-secondary" (click)="mostrarClave.set(!mostrarClave())"
+                        [attr.aria-label]="mostrarClave() ? 'Ocultar clave' : 'Mostrar clave'">
+                  <i class="bi" [class.bi-eye]="!mostrarClave()" [class.bi-eye-slash]="mostrarClave()"></i>
+                </button>
+              </div>
+              <app-error-campo [control]="form.controls.password" />
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label for="confirmar" class="form-label">Repite la clave</label>
+              <input id="confirmar" [type]="mostrarClave() ? 'text' : 'password'" class="form-control"
+                     formControlName="confirmar" autocomplete="new-password" required
+                     [class.is-invalid]="(form.controls.confirmar.invalid || form.hasError('noCoinciden')) && form.controls.confirmar.touched">
+              <app-error-campo [control]="form.controls.confirmar" />
+              @if (form.hasError('noCoinciden') && form.controls.confirmar.touched) {
+                <div class="invalid-feedback d-block">Las claves no coinciden</div>
+              }
+            </div>
+
+            <div class="col-12">
+              <ul class="list-unstyled row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-1 small mb-0">
+                @for (regla of reglas; track regla.texto) {
+                  <li class="col" [class.text-success]="regla.cumple(clave())" [class.text-body-secondary]="!regla.cumple(clave())">
+                    <i class="bi me-1" [class.bi-check-circle-fill]="regla.cumple(clave())"
+                       [class.bi-circle]="!regla.cumple(clave())"></i>{{ regla.texto }}
+                  </li>
+                }
+              </ul>
+            </div>
+
+            <div class="col-12">
+              <div class="form-check">
+                <input id="aceptaNormas" type="checkbox" class="form-check-input" formControlName="aceptaNormas" required
+                       [class.is-invalid]="form.controls.aceptaNormas.invalid && form.controls.aceptaNormas.touched">
+                <label for="aceptaNormas" class="form-check-label">
+                  Leí y acepto las <a routerLink="/normas" target="_blank">normas del foro</a>
+                </label>
+              </div>
+              <app-error-campo [control]="form.controls.aceptaNormas" />
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 btn-lg mt-4">Crear mi cuenta</button>
+          <p class="text-center small mt-3 mb-0">¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
