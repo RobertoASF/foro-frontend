@@ -1,59 +1,125 @@
-# ForoFrontend
+# Mesa TCG: frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.3.0.
+Frontend del foro de juegos de cartas coleccionables. Tiene cinco categorías: Magic The Gathering, Mitos y Leyendas, Pokemon TCG, One Piece TCG y Yu-Gi-Oh!
 
-## Development server
+Hecho con Angular 22, Bootstrap 5.3, Bootstrap Icons, HTML, CSS y TypeScript.
 
-To start a local development server, run:
+Como pide la actividad, este frontend funciona separado del backend: los datos viven en arreglos dentro de los servicios de Angular. Son los mismos registros que se cargan en Oracle para los microservicios. Al recargar la página, los datos vuelven a su estado inicial.
 
-```bash
-ng serve
+## Roles
+
+| Acción | USUARIO | MODERADOR | ADMIN |
+|---|---|---|---|
+| Publicar, comentar y editar lo propio | Sí | Sí | Sí |
+| Reportar temas y comentarios | Sí | Sí | Sí |
+| Eliminar contenido de otros | No | Sí | Sí |
+| Banear contenido y revisar reportes | No | Sí | Sí |
+| Levantar baneos y gestionar normas | No | No | Sí |
+| Gestionar usuarios y categorías | No | No | Sí |
+
+Las rutas privadas están protegidas con guards: `sesionGuard` pide sesión iniciada y `rolGuard` revisa el rol.
+
+## Pantallas
+
+| Ruta | Pantalla | Acceso |
+|---|---|---|
+| `/` | Inicio con categorías y temas recientes | Público |
+| `/login` | Inicio de sesión | Sin sesión |
+| `/registro` | Registro de usuarios | Sin sesión |
+| `/recuperar-clave` | Recuperar contraseña con código (correo simulado) | Sin sesión |
+| `/perfil` | Modificación de perfil y cambio de clave | Con sesión |
+| `/categorias/:id` | Temas de una categoría | Público |
+| `/buscar` | Búsqueda por texto, categoría y autor | Público |
+| `/temas/:id` | Tema con comentarios, reportes y baneo | Público |
+| `/temas/nuevo` y `/temas/:id/editar` | Publicar y editar temas | Con sesión |
+| `/normas` | Normas del foro | Público |
+| `/moderacion` | Reportes, baneos y normas | MODERADOR y ADMIN |
+| `/admin/usuarios` | Crear, cambiar rol, activar y eliminar usuarios | ADMIN |
+| `/admin/categorias` | Crear, editar y eliminar categorías | ADMIN |
+
+## Patrón de diseño
+
+Se usa el patrón **Observer** junto con servicios **Singleton**.
+
+- Cada servicio (`UsuarioService`, `SesionService`, `ForoService`, `ModeracionService`) se registra con `providedIn: 'root'`, así existe una sola instancia para toda la aplicación.
+- Los datos se guardan en `ColeccionObservable`, una clase que envuelve un arreglo en un `BehaviorSubject` de RxJS. Cada vez que el arreglo cambia, avisa a quienes estén suscritos.
+- Los componentes se suscriben a esos observables y los convierten en signals con `toSignal`. Por eso la barra de navegación muestra al instante el contador de reportes pendientes cuando alguien reporta un tema, o cierra la sesión si un administrador desactiva la cuenta.
+
+```
+Servicio (sujeto)  ──cambios$──▶  Componente (observador)  ──▶  Vista
+     ▲                                     │
+     └──────────── acción del usuario ─────┘
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Validaciones
 
-## Code scaffolding
+Todos los formularios usan Reactive Forms y también atributos HTML (`required`, `minlength`, `maxlength`, `type="email"`, `pattern`). Los mensajes se muestran bajo cada campo cuando la persona lo toca.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+La clave tiene seis reglas, las mismas que valida `ms-usuarios`:
 
-```bash
-ng generate component component-name
+1. Entre 8 y 20 caracteres.
+2. Al menos una mayúscula.
+3. Al menos una minúscula.
+4. Al menos un número.
+5. Al menos un carácter especial.
+6. Sin espacios.
+
+Además se valida que el nombre de usuario y el email no estén en uso, que las claves coincidan y que los textos no queden solo con espacios.
+
+## Diseño adaptable
+
+Se usa el grid de 12 columnas de Bootstrap y se probó en tres tamaños:
+
+| Tamaño | Ancho | Qué cambia |
+|---|---|---|
+| Celular | 375 px | Menú colapsado, una columna, usuarios en tarjetas |
+| Tablet | 768 px | Dos columnas de categorías, tablas con scroll |
+| Escritorio | 1366 px | Menú completo, tres columnas y barra lateral |
+
+## Estructura
+
+```
+src/app
+├── data         Arreglos con los datos iniciales
+├── guards       Protección de rutas por sesión y rol
+├── models       Interfaces del dominio
+├── pages        Una carpeta por pantalla
+├── services     Servicios Singleton con colecciones observables
+├── shared       Barra de navegación, pie, tarjeta de tema y mensajes de error
+└── validators   Validadores propios de los formularios
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Cuentas de prueba
+
+Todas usan la clave `Foro2026*`.
+
+| Usuario | Rol |
+|---|---|
+| `admin` | ADMIN |
+| `moderador` | MODERADOR |
+| `camila` | USUARIO |
+| `tomas` | USUARIO desactivado (no puede entrar) |
+
+## Cómo ejecutarlo
+
+Con Node 22:
 
 ```bash
-ng generate --help
+npm install
+npm start
 ```
 
-## Building
+Queda en `http://localhost:4200`.
 
-To build the project run:
+Con Docker, se compila y se sirve con Nginx:
 
 ```bash
-ng build
+docker build -t foro-frontend .
+docker run -p 4200:80 foro-frontend
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Pruebas
 
 ```bash
-ng test
+npm test -- --watch=false
 ```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
